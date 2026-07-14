@@ -1,45 +1,98 @@
-# NexaMall Cloud（云枢商城）
+# NexaMall Cloud
 
-## 项目介绍
+## Project Overview
 
-NexaMall Cloud 是一个基于 Spring Cloud 构建的分布式电商系统。“Nexa”源自 Nexus，寓意将用户、商品、购物车、订单、营销、商家、结算、平台、任务、风控、对象存储与搜索等业务域连接成完整的电商服务网络。
+NexaMall Cloud is a cloud-native e-commerce platform built with Java, Spring Boot, and Spring Cloud. Its domain-oriented microservices cover authentication, users, sellers, products, carts, orders, promotions, settlement, risk control, object storage, search, scheduled jobs, API routing, and administration.
 
-项目采用 Maven 多模块与领域化服务拆分，覆盖 API 网关、服务注册与配置、服务间调用、认证授权、缓存、消息、分布式事务、数据持久化、搜索和后台管理等典型微服务场景。目前项目处于现代化重构阶段：已完成 Java 17 与 Spring Boot 2.6 过渡基线，后续将迁移到 Java 21、Spring Boot 3.5 和 Spring Security 6 技术体系。
+The platform uses Nacos for service discovery and configuration, Spring Cloud Gateway for API routing, OpenFeign for service communication, MySQL and MyBatis-Plus for persistence, Redis for caching, RabbitMQ for asynchronous messaging, Elasticsearch for search, and Seata for distributed transactions. The project is organized as a Maven multi-module application and includes Docker Compose infrastructure for local development.
 
-## 技术栈
+## Getting Started
 
-### 当前已验证技术栈
+### Prerequisites
 
-| 分类 | 技术 |
-| --- | --- |
-| 开发语言 | Java 17，使用 JDK 21 构建 |
-| 核心框架 | Spring Boot 2.6.13、Spring Framework 5 |
-| 微服务 | Spring Cloud 2021.0.5、Spring Cloud Alibaba 2021.0.6.0 |
-| 注册与配置 | Nacos |
-| API 网关 | Spring Cloud Gateway |
-| 服务调用 | OpenFeign、Spring Cloud LoadBalancer |
-| 服务治理 | Resilience4j、Sentinel |
-| 认证授权 | Spring Security、Spring Security OAuth2（待替换） |
-| 数据访问 | MyBatis-Plus 3.3.0、Druid、MySQL 8 |
-| 缓存 | Redis、Redisson |
-| 消息队列 | RabbitMQ、Spring Cloud Stream |
-| 分布式事务 | Seata、ShardingSphere |
-| 搜索 | Elasticsearch、Spring Data Elasticsearch |
-| 对象存储 | 七牛云、阿里云 OSS |
-| 测试 | JUnit 5 |
-| 构建与工程化 | Maven Wrapper 3.9.11、Lombok、Docker Compose |
+- JDK 21
+- Docker Engine with Docker Compose v2
+- At least 8 GB of available memory
 
-### 现代化目标技术栈
+The Maven Wrapper is included, so a separate Maven installation is not required.
 
-| 分类 | 目标技术 |
-| --- | --- |
-| Java | Java 21 LTS |
-| 核心框架 | Spring Boot 3.5、Spring Framework 6、Jakarta EE |
-| 微服务 | Spring Cloud 2025.0、Spring Cloud Alibaba 2025.0 |
-| 安全 | Spring Security 6、Spring Authorization Server、OAuth 2.1、OIDC、JWT |
-| 数据 | MyBatis-Plus Boot 3 Starter、Flyway、MySQL 8.4 LTS |
-| 缓存与消息 | Redis 7、Redisson、RabbitMQ、Spring Cloud Stream 函数式模型 |
-| 搜索 | Elasticsearch 8、Spring Data Elasticsearch |
-| 可观测性 | Spring Boot Actuator、Micrometer、OpenTelemetry、Prometheus、Grafana |
-| 测试 | JUnit 5、Testcontainers、Awaitility |
-| 部署 | OCI 镜像、Docker Compose、Kubernetes、Helm |
+### 1. Create the Local Environment File
+
+Linux or macOS:
+
+```bash
+cp .env.example .env
+```
+
+PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Review the values in `.env` before starting the services. The defaults are intended for local development only.
+
+### 2. Start the Infrastructure
+
+```bash
+docker compose -f compose.legacy.yml up -d
+docker compose -f compose.legacy.yml ps
+```
+
+This starts MySQL, Redis, RabbitMQ, Nacos, Seata, and Elasticsearch.
+
+### 3. Configure Nacos
+
+1. Open `http://localhost:8848/nacos`.
+2. Create the `shop` group.
+3. Create the required service Data IDs using the examples in `doc/properties`.
+4. Update database, Redis, RabbitMQ, and service addresses for the local environment.
+
+### 4. Build the Project
+
+Linux or macOS:
+
+```bash
+./mvnw -B -ntp -f shop-dependencies/pom.xml install
+./mvnw -B -ntp -DskipTests clean package
+```
+
+PowerShell:
+
+```powershell
+.\mvnw.cmd -B -ntp -f shop-dependencies\pom.xml install
+.\mvnw.cmd -B -ntp -DskipTests clean package
+```
+
+### 5. Start the Services
+
+Start services in the following order:
+
+1. `shop-auth`
+2. `shop-platform`, `shop-user`, and `shop-goods`
+3. `shop-order`, `shop-cart`, and `shop-activity`
+4. Other required business services
+5. `shop-gateway`
+6. `shop-manage`
+
+Run a service with the Maven Wrapper. For example:
+
+Linux or macOS:
+
+```bash
+./mvnw -pl shop-gateway -am spring-boot:run
+```
+
+PowerShell:
+
+```powershell
+.\mvnw.cmd -pl shop-gateway -am spring-boot:run
+```
+
+Confirm that each service is registered in Nacos before starting services that depend on it.
+
+### 6. Stop the Infrastructure
+
+```bash
+docker compose -f compose.legacy.yml down
+```
