@@ -1,0 +1,24 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        group: shop
+        namespace: ${NACOS_NAMESPACE:}
+        extension-configs:
+          - data-id: shop-common.properties
+            group: shop
+            refresh: true
+          - data-id: shop-redis.properties
+            group: shop
+            refresh: true
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        group: shop
+        namespace: ${NACOS_NAMESPACE:}
+    sentinel:
+      enabled: true
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1:8080}
+      filter:
+        enabled: true

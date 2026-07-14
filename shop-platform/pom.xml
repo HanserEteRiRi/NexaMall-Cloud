@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>nexamall-cloud</artifactId>
+        <groupId>quick.pager</groupId>
+        <version>cloud-1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>shop-platform</artifactId>
+    <packaging>pom</packaging>
+    <description>Shop 中台</description>
+    <modules>
+        <module>shop-platform-api</module>
+        <module>shop-platform-client</module>
+        <module>shop-platform-model</module>
+    </modules>
+
+    <build>
+        <plugins>
+        </plugins>
+    </build>
+
+</project>
